@@ -27,10 +27,10 @@ npm i
 - Create a `.env` file at project root and provide the secrets:
 
 ```
-NEXT_PUBLIC_THE_ONE_API_BASE_URL=
-NEXT_PUBLIC_THE_ONE_API_ACCESS_TOKEN=
-NEXT_PUBLIC_TMDB_API_BASE_URL=
-NEXT_PUBLIC_TMDB_API_KEY=
+NEXT_PUBLIC_THE_ONE_API_BASE_URL=https://the-one-api.dev/v2
+NEXT_PUBLIC_THE_ONE_API_ACCESS_TOKEN=XMhBL73r1d4LXY_EP8Xf
+NEXT_PUBLIC_TMDB_API_BASE_URL=https://api.themoviedb.org/3
+NEXT_PUBLIC_TMDB_API_KEY=6efaf7997ff8f6c3545d16cf9321f85b
 ```
 
 Next, to start the dev server:
