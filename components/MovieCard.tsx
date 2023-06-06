@@ -3,6 +3,7 @@ import Image from "next/image";
 import tmdb from "@/lib/tmdb";
 import { Movie } from "./Movies";
 import defaultToastError from "@/lib/defaultToastError";
+import useToast from "@/hooks/useToast";
 
 interface MovieCardProps extends ComponentProps<"section"> {
   movie: Movie;
@@ -10,6 +11,8 @@ interface MovieCardProps extends ComponentProps<"section"> {
 
 const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
   const [posterPath, setPosterPath] = useState("");
+  const toast = useToast();
+
   useEffect(() => {
     async function get() {
       try {
@@ -18,11 +21,11 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         });
         setPosterPath(data.results[0].poster_path);
       } catch (e) {
-        defaultToastError(e);
+        toast(defaultToastError(e));
       }
     }
     get();
-  }, [movie.name]);
+  }, [movie.name, toast]);
 
   return (
     <li className="relative aspect-[2/3] group overflow-hidden rounded-b-2xl bg-transparent perspective p-4 reflection">

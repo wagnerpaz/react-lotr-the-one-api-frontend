@@ -10,6 +10,7 @@ import ReactSelectAsync from "./ReactSelectAsync";
 import { Character } from "./Characters";
 import { Movie } from "./Movies";
 import defaultToastError from "@/lib/defaultToastError";
+import useToast from "@/hooks/useToast";
 
 export interface Quote {
   _id: string;
@@ -28,6 +29,8 @@ const Quotes = ({ serverQuotes }) => {
   const [characterSearch, setCharacterSearch] = useState("");
   const [character, setCharacter] = useState("");
   const [characters, setCharacters] = useState<Character[]>([]);
+
+  const toast = useToast();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchQuotes = useCallback(
@@ -53,7 +56,7 @@ const Quotes = ({ serverQuotes }) => {
         }));
         setPages(data.pages);
       } catch (e) {
-        defaultToastError(e);
+        toast(defaultToastError(e));
       } finally {
         setLoading(false);
       }
@@ -95,7 +98,7 @@ const Quotes = ({ serverQuotes }) => {
           Array.from(new Set([...characters, ...(data.docs as Character[])]))
         );
       } catch (e) {
-        defaultToastError(e);
+        toast(defaultToastError(e));
       }
     }
     if (quotes[`${currPage}`]) get();
@@ -122,7 +125,7 @@ const Quotes = ({ serverQuotes }) => {
           });
           setMovie(data.docs.map((m: Movie) => m._id).join(","));
         } catch (e) {
-          defaultToastError(e);
+          toast(defaultToastError(e));
         }
       }
     }, 500),
@@ -141,7 +144,7 @@ const Quotes = ({ serverQuotes }) => {
           });
           setCharacter(data.docs.map((m: Movie) => m._id).join(","));
         } catch (e) {
-          defaultToastError(e);
+          toast(defaultToastError(e));
         }
       }
     }, 500),
