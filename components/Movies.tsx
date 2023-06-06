@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 import theOneApi from "@/lib/theOneApi";
 import MovieCard from "@/components/MovieCard";
+import defaultToastError from "@/lib/defaultToastError";
+import useToast from "@/hooks/useToast";
 
 export interface Movie {
   _id: string;
@@ -14,9 +16,10 @@ export interface Movie {
   rottenTomatoesScore: number;
 }
 
-const Movies = ({ serverMovies }) => {
-  const [movies, setMovies] = useState(serverMovies || []);
+const Movies = () => {
+  const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     async function get() {
@@ -25,16 +28,16 @@ const Movies = ({ serverMovies }) => {
         const { data } = await theOneApi.get("/movie");
         setMovies(data.docs);
       } catch (e) {
-        //TODO
+        toast(defaultToastError(e));
       } finally {
         setLoading(false);
       }
     }
     get();
-  }, []);
+  }, [toast]);
 
   const moviesFiltered = useMemo(
-    () => movies.filter((f) => !f.name.includes("Series")),
+    () => movies.filter((f: Movie) => !f.name.includes("Series")),
     [movies]
   );
 
@@ -54,4 +57,4 @@ const Movies = ({ serverMovies }) => {
   );
 };
 
-export default Movies;
+export default memo(Movies);

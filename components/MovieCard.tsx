@@ -2,6 +2,7 @@ import { ComponentProps, useEffect, useState } from "react";
 import Image from "next/image";
 import tmdb from "@/lib/tmdb";
 import { Movie } from "./Movies";
+import defaultToastError from "@/lib/defaultToastError";
 
 interface MovieCardProps extends ComponentProps<"section"> {
   movie: Movie;
@@ -17,7 +18,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         });
         setPosterPath(data.results[0].poster_path);
       } catch (e) {
-        //TODO
+        defaultToastError(e);
       }
     }
     get();

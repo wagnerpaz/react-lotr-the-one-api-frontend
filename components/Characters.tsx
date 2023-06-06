@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, ChangeEvent } from "react";
 import debounce from "lodash.debounce";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -7,10 +7,9 @@ import CharacterCard from "@/components/CharactersCard";
 import Input from "@/components/Input";
 import FormControl from "@/components/FormControl";
 import Select from "@/components/Select";
-import genders from "@/lib/genders.json";
-import races from "@/lib/races.json";
-import realms from "@/lib/realms.json";
 import removeEmptyProps from "@/lib/removeEmptyProps";
+import defaultToastError from "@/lib/defaultToastError";
+import useToast from "@/hooks/useToast";
 
 export interface Character {
   _id: string;
@@ -30,10 +29,12 @@ const Characters = ({ serverCharacters }) => {
   const [characters, setCharacters] = useState(serverCharacters || []);
   const [loading, setLoading] = useState(false);
   const [pages, setPages] = useState(1);
-  const [name, setName] = useState();
-  const [gender, setGender] = useState();
-  const [race, setRace] = useState();
-  const [realm, setRealm] = useState();
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+  const [race, setRace] = useState("");
+  const [realm, setRealm] = useState("");
+
+  const toast = useToast();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchCharacters = useCallback(
@@ -46,22 +47,25 @@ const Characters = ({ serverCharacters }) => {
     ) {
       try {
         setLoading(page === 1);
-        const { data } = await theOneApi.get(`/character?limit=20`, {
-          params: removeEmptyProps({
-            page,
-            name: name && `/${name}/i`,
-            gender,
-            race,
-            realm,
-          }),
-        });
+        const { data } = await theOneApi.get(
+          `/character?limit=20&sort=name:asc`,
+          {
+            params: removeEmptyProps({
+              page,
+              name: name && `/${name}/i`,
+              gender: gender && `/${gender}/i`,
+              race: race && `/${race}/i`,
+              realm: realm && `/${realm}/i`,
+            }),
+          }
+        );
         setCharacters((characters: Character[]) => ({
           ...(page !== 1 ? characters : []),
           [`${page}`]: data.docs,
         }));
         setPages(data.pages);
       } catch (e) {
-        //TODO
+        toast(defaultToastError(e));
       } finally {
         setLoading(false);
       }
@@ -118,48 +122,45 @@ const Characters = ({ serverCharacters }) => {
           <Input
             value={name}
             placeholder="Search a name..."
-            onChange={(e: MouseEvent) => setName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setName(e.target.value)
+            }
           />
         </FormControl>
         <FormControl label="Gender">
-          <Select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option className="bg-dark" value="">
-              Any
-            </option>
-            {genders.map((gender) => (
-              <option className="bg-dark" key={gender}>
-                {gender}
-              </option>
-            ))}
-          </Select>
+          <Input
+            value={gender}
+            placeholder="Search for a gender..."
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setGender(e.target.value);
+            }}
+          />
         </FormControl>
         <FormControl label="Race">
-          <Select value={race} onChange={(e) => setRace(e.target.value)}>
-            <option className="bg-dark" value="">
-              Any
-            </option>
-            {races.map((race) => (
-              <option className="bg-dark" key={race}>
-                {race}
-              </option>
-            ))}
-          </Select>
+          <Input
+            value={race}
+            placeholder="Search for a race..."
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setRace(e.target.value);
+            }}
+          />
         </FormControl>
         <FormControl label="Realm">
-          <Select value={realm} onChange={(e) => setRealm(e.target.value)}>
-            <option className="bg-dark" value="">
-              Any
-            </option>
-            {realms.map((realm) => (
-              <option className="bg-dark" key={realm}>
-                {realm}
-              </option>
-            ))}
-          </Select>
+          <Input
+            value={realm}
+            placeholder="Search for a realm..."
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setRealm(e.target.value);
+            }}
+          />
         </FormControl>
       </div>
       {loading ? (
         loader
+      ) : unpaginatedCharacters.length === 0 ? (
+        <div className="w-full h-full flex items-center justify-center">
+          Nothing found!
+        </div>
       ) : (
         <InfiniteScroll
           loadMore={fetchItems}

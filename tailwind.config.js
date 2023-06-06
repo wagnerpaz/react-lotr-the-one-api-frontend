@@ -18,6 +18,11 @@ module.exports = {
         "dark-a11y-high": "#f6f6f6",
         "dark-a11y-medium": "#ececec",
         "dark-a11y-low": "#e1e1e1",
+        remove: "#ce1414",
+        warning: "#DD6B20",
+        error: "#E53E3E",
+        info: "#3182CE",
+        success: "#38A169",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
